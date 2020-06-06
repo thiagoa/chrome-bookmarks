@@ -15,6 +15,11 @@ logger = logging.getLogger(__name__)
 
 home = f"/home/{getpass.getuser()}"
 
+# TODO:
+#
+# 1. Set config for Chrome/Chromium/Brave config folder. Default to the one below.
+# 2. Find profiles dynamically.
+# 3. Improve error reporting
 bookmark_paths = [
     (f"{home}/.config/google-chrome/Default/Bookmarks", 'google-chrome')
 ]
