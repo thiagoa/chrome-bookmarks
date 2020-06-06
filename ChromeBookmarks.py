@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import getpass
 
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
@@ -12,6 +13,11 @@ from ulauncher.api.shared.action.OpenUrlAction import OpenUrlAction
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
+home = f"/home/{getpass.getuser()}"
+
+bookmark_paths = [
+    (f"{home}/.config/google-chrome/Default/Bookmarks", 'google-chrome')
+]
 support_browsers = ['google-chrome', 'chromium', 'Brave-Browser']
 browser_imgs = {
     'google-chrome': 'images/chrome.png',
@@ -31,29 +37,11 @@ class ChromeBookmarks(Extension):
     max_matches_len = 10
 
     def __init__(self):
-        self.bookmarks_paths = self.find_bookmarks_paths()
+        self.bookmarks_paths = bookmark_paths
         super(ChromeBookmarks, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
 
-    @staticmethod
-    def find_bookmarks_paths():
-        res_lst = []
-        for browser in support_browsers:
-            f = os.popen('locate %s | grep Bookmarks' % browser)
-            res = f.read().split('\n')
-            if len(res) == 0:
-                logger.info('Path to the %s Bookmarks was not found' % browser)
-                continue
-            for one_path in res:
-                if one_path.endswith('Bookmarks'):
-                    res_lst.append((one_path, browser))
-
-        if len(res_lst) == 0:
-            logger.exception('Path to the Chrome Bookmarks was not found')
-        return res_lst
-
     def find_rec(self, data, query, matches):
-
         if self.matches_len >= self.max_matches_len:
             return
 
@@ -69,7 +57,6 @@ class ChromeBookmarks(Extension):
         return matches
 
     def get_items(self, query):
-
         items = []
         self.matches_len = 0
 
